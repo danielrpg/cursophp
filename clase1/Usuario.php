@@ -15,4 +15,8 @@ class Usuario {
     public function set_usuario() {
         $this->nombre = 'Juan';
     }
+
+    public function get_usuario(){
+        return $this->nombre;
+    }
 }
