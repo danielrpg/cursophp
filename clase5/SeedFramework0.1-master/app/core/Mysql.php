@@ -6,14 +6,9 @@
  * @author Daniel Fernandez
  */
 class Mysql {
-    
         var $con;
-        
         private $num;
-
-
         function __construct($db=array()) {
-		
 		$default = array(
 			'host' => 'localhost',
 			'user' => 'root',
@@ -22,67 +17,43 @@ class Mysql {
 		);
 		
 		$db = array_merge($default,$db);
-		
 		$this->con=mysql_connect($db['host'],$db['user'],$db['pass'],true) or die ('Error connecting to MySQL');
-		
 		mysql_select_db($db['db'],$this->con) or die('Database '.$db['db'].' does not exist!');
-		
-                $this->num = 0;
+		$this->num = 0;
 	}
 	
 	function __destruct() {
-            
 		mysql_close($this->con);
-	
-        }
+	}
 	
 	function query($s='',$rows=false,$organize=true) {
-		
             if (!$q=mysql_query($s,$this->con)) return false;
-	
             if ($rows!==false) $rows = intval($rows);
-	
             $rez=array(); $count=0;
-	
             $type = $organize ? MYSQL_NUM : MYSQL_ASSOC;
-	
             while (($rows===false || $count<$rows) && $line=mysql_fetch_array($q,$type)) {
-	
                 if ($organize) {
-		
                     foreach ($line as $field_id => $value) {
-		
                         $table = mysql_field_table($q, $field_id);
-			
                         if ($table==='') $table=0;
-			
                         $field = mysql_field_name($q,$field_id);
-			
                         $rez[$count][$table][$field]=$value;
-			
-                        }
+					}
 		
                 } else {
-		
                     $rez[$count] = $line;
-		
                 }
-		
                 ++$count;
             }
             
-	    $this->num = $count;
-            
+	        $this->num = $count;
             if (!mysql_free_result($q)) return false;
-	
             return $rez;
 	}
         
-        function getNumFields(){
-            
+	function getNumFields(){
             return $this->num;
-            
-        }
+	}
 	
 	function execute($s='') {
 		if (mysql_query($s,$this->con)) return true;
@@ -128,50 +99,33 @@ class Mysql {
 	}
 	
 	function update($table=null,$array_of_values=array(),$conditions='FALSE') {
-            
 		if ($table===null || empty($array_of_values)) return false;
-                
 		$what_to_set = array();
-                
 		foreach ($array_of_values as $field => $value) {
-                    
 			if (is_array($value) && !empty($value[0])) $what_to_set[]="`$field`='{$value[0]}'";
-                        
 			else $what_to_set []= "`$field`='".mysql_real_escape_string($value,$this->con)."'";
 		}
 		$what_to_set_string = implode(',',$what_to_set);
-                
 		return $this->execute("UPDATE $table SET $what_to_set_string WHERE $conditions");
 	}
 	
 	function insert($table=null,$array_of_values=array()) {
-            
 		if ($table===null || empty($array_of_values) || !is_array($array_of_values)) return false;
-	
                 $fields=array();
-                
                 $values=array();
-		
                 foreach ($array_of_values as $id => $value) {
-		
                     $fields[]=$id;
-		
                     if (is_array($value) && !empty($value[0])) $values[]=$value[0];
-		
                     else $values[]="'".mysql_real_escape_string($value,$this->con)."'";
-		}
+		        }
 		
                 $s = "INSERT INTO $table (".implode(',',$fields).') VALUES ('.implode(',',$values).')';
-		
                 if (mysql_query($s,$this->con)) return mysql_insert_id($this->con);
-		
                 return false;
 	}
 	
 	function delete($table=null,$conditions='FALSE') {
-		
             if ($table===null) return false;
-	
             return $this->execute("DELETE FROM $table WHERE $conditions");
 	}
 }

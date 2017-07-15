@@ -19,9 +19,6 @@ class ClientController {
                 $client = new ClientsView();
                 $client->runClients();
                 break;
-            
-          
-    
         }
     }
 }
