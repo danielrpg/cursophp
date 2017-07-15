@@ -16,21 +16,26 @@ class Index {
     public function run($page){
   	  switch ($page) {
   		  case 'index':
-  			  $users = new UsersController();
-         	$users->runIndex();
+  		      $users = new UsersController();
+         	  $users->runIndex();
   			  break;
-        case 'clients':
-          $client_controller = new ClientController();
-          $client_controller->runIndex();
-          break;
-          default:
-          $index_view = new IndexView();
-          $index_view->runIndex();
-          break;
+          case 'clients':
+              $client_controller = new ClientController();
+              $client_controller->runIndex();
+              break;
+          case 'default':
+              $index_view = new IndexView();
+              $index_view->runIndex();
+              break;
   	  }   
     }
 }
 $index = new Index();
-$index->run($_GET['view']);
+if(isset($_GET['view'])){
+    $index->run($_GET['view']);
+}else{
+    $index->run('default');
+}
+
 ob_end_flush();
 ?>
