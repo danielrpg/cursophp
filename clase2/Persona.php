@@ -6,4 +6,8 @@ class Persona {
     private $edad;
     protected $pasaporte;
 
+    function donar_sangre(){
+
+    }
+
 }
